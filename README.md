@@ -28,6 +28,7 @@ Qwen 3, GPT-OSS, Gemma 3, Llama and more, with <strong>MoE on phones</strong> vi
   <a href="#supported-models">Models</a> ·
   <a href="#android-build">Android</a> ·
   <a href="#quantization">Quantization</a> ·
+  <a href="#chat-template">Chat Template</a> ·
   <a href="docs/architecture.md">Architecture</a>
 </p>
 
@@ -224,6 +225,78 @@ All artifacts land under `jni/libs/arm64-v8a/`.
 > **Q4_0 is ISA-specific** — an x86-quantized Q4_0 binary is not byte-compatible with ARM. Quantize on the same architecture you serve from.
 
 After quantization, point `quick_dot_ai_run` at the quantized directory (or `mv nntr_config_quantized.json nntr_config.json` in place and rerun).
+
+---
+
+## Chat Template
+
+Quick.AI supports automatic chat template formatting by reading the `chat_template` field from HuggingFace's `tokenizer_config.json`. This eliminates the need for hardcoded per-model chat formatting.
+
+### How it works
+
+Most HuggingFace models include a `tokenizer_config.json` with a `chat_template` field (Jinja2 format) that defines how to format conversations. Quick.AI includes a built-in mini Jinja2 renderer that processes these templates at runtime.
+
+When a `tokenizer_config.json` is present in the model directory:
+- **CLI (`quick_dot_ai_run`)**: Raw user input provided as a command-line argument is automatically wrapped with the chat template.
+- **C API**: The `apply_chat_template()` function uses the dynamic template instead of hardcoded formats.
+
+If `tokenizer_config.json` is absent or does not contain a `chat_template` field, a warning is printed and the system falls back to hardcoded per-architecture templates (Llama, Qwen, Gemma3).
+
+### Supported template features
+
+The built-in Jinja2 renderer supports the following constructs commonly used in HuggingFace chat templates:
+
+| Feature | Example |
+|---------|---------|
+| For loops | `{% for message in messages %}...{% endfor %}` |
+| Conditionals | `{% if %}...{% elif %}...{% else %}...{% endif %}` |
+| Output expressions | `{{ bos_token }}` |
+| Variable assignment | `{% set offset = 1 %}` |
+| Dict/array access | `message['role']`, `messages[0]` |
+| String concatenation | `'<\|im_start\|>' + message['role']` |
+| Comparison operators | `==`, `!=`, `>`, `<`, `>=`, `<=` |
+| Boolean operators | `and`, `or`, `not` |
+| Loop variables | `loop.first`, `loop.last`, `loop.index`, `loop.index0` |
+| Filters | `\| trim`, `\| length`, `\| tojson` |
+| String methods | `.strip()`, `.startswith()`, `.upper()`, `.split()` |
+| Containment test | `'keyword' in message['content']` |
+| Namespace | `namespace()` for cross-scope variable mutation |
+| Whitespace control | `{%- -%}`, `{{- -}}` |
+
+### Required files
+
+To use chat templates, ensure `tokenizer_config.json` is in your model directory alongside the other config files. This file is included by default when downloading models from HuggingFace.
+
+### Example
+
+```bash
+# With tokenizer_config.json present, raw input is auto-formatted:
+./build/quick_dot_ai_run /path/to/model "What is machine learning?"
+
+# The input will be automatically wrapped, e.g. for Qwen3:
+# <|im_start|>user
+# What is machine learning?<|im_end|>
+# <|im_start|>assistant
+```
+
+### Multi-turn conversations (API)
+
+The C API supports multi-turn conversations through `ChatMessage`:
+
+```cpp
+#include "chat_template.h"
+
+quick_dot_ai::ChatTemplate tmpl = quick_dot_ai::ChatTemplate::fromFile("tokenizer_config.json");
+
+std::vector<quick_dot_ai::ChatMessage> messages = {
+  {"system", "You are a helpful assistant."},
+  {"user", "Hello!"},
+  {"assistant", "Hi there!"},
+  {"user", "How are you?"}
+};
+
+std::string formatted = tmpl.apply(messages);
+```
 
 ---
 
