@@ -39,6 +39,8 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
+          config-file: ./.github/codeql/codeql-config.yml
+          source-root: ${{ github.workspace }}
 
       - name: Install build dependencies (C/C++)
         if: matrix.build-mode == 'manual'
