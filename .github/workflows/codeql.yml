@@ -46,8 +46,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             build-essential \
+            cmake \
             pkg-config \
             libopenblas-dev \
+            libiniparser-dev \
+            libomp-dev \
             libflatbuffers-dev \
             flatbuffers-compiler
           pip install meson ninja

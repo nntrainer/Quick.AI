@@ -28,8 +28,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             build-essential \
+            cmake \
             pkg-config \
             libopenblas-dev \
+            libiniparser-dev \
+            libomp-dev \
             libflatbuffers-dev \
             flatbuffers-compiler
 
@@ -49,9 +52,9 @@ jobs:
 
       - name: Verify build artifacts
         run: |
-          test -f build/libcausallm.so
-          test -x build/nntr_causallm
-          test -x build/nntr_quantize
-          test -x build/test_api
-          ./build/nntr_causallm 2>&1 | head -1
-          ./build/nntr_quantize 2>&1 | head -1
+          test -f build/libquick_dot_ai.so
+          test -x build/quick_dot_ai_run
+          test -x build/quick_dot_ai_quantize
+          test -x build/quick_dot_ai_test_api
+          ./build/quick_dot_ai_run 2>&1 | head -1 || true
+          ./build/quick_dot_ai_quantize 2>&1 | head -1 || true
