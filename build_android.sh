@@ -94,7 +94,10 @@ if [ ! -f "$NNTRAINER_ROOT/builddir/android_build_result/lib/arm64-v8a/libnntrai
     if [ -d "$NNTRAINER_ROOT/builddir" ]; then
         rm -rf builddir
     fi
-    ./tools/package_android.sh
+    # Use a user-writable prefix so `meson install` does not try to
+    # escalate privileges to write into /usr/local (fails in CI / non-
+    # interactive environments).
+    ./tools/package_android.sh "-Dprefix=$NNTRAINER_ROOT/builddir/install"
 else
     log_info "nntrainer for Android already built (skipping)"
 fi
