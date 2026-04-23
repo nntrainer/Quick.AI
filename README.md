@@ -10,10 +10,10 @@ Qwen 3, GPT-OSS, Gemma 3, Llama and more, with <strong>MoE on phones</strong> vi
 </p>
 
 <p>
-  <a href="https://github.com/EunjuYang/Quick.AI/actions/workflows/ci-linux.yml"><img src="https://github.com/EunjuYang/Quick.AI/actions/workflows/ci-linux.yml/badge.svg" alt="Linux"/></a>
-  <a href="https://github.com/EunjuYang/Quick.AI/actions/workflows/ci-android.yml"><img src="https://github.com/EunjuYang/Quick.AI/actions/workflows/ci-android.yml/badge.svg" alt="Android"/></a>
-  <a href="https://github.com/EunjuYang/Quick.AI/actions/workflows/cpp-linter.yml"><img src="https://github.com/EunjuYang/Quick.AI/actions/workflows/cpp-linter.yml/badge.svg" alt="Format"/></a>
-  <a href="https://github.com/EunjuYang/Quick.AI/actions/workflows/codeql.yml"><img src="https://github.com/EunjuYang/Quick.AI/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"/></a>
+  <a href="https://github.com/nntrainer/Quick.AI/actions/workflows/ci-linux.yml"><img src="https://github.com/nntrainer/Quick.AI/actions/workflows/ci-linux.yml/badge.svg" alt="Linux"/></a>
+  <a href="https://github.com/nntrainer/Quick.AI/actions/workflows/ci-android.yml"><img src="https://github.com/nntrainer/Quick.AI/actions/workflows/ci-android.yml/badge.svg" alt="Android"/></a>
+  <a href="https://github.com/nntrainer/Quick.AI/actions/workflows/cpp-linter.yml"><img src="https://github.com/nntrainer/Quick.AI/actions/workflows/cpp-linter.yml/badge.svg" alt="Format"/></a>
+  <a href="https://github.com/nntrainer/Quick.AI/actions/workflows/codeql.yml"><img src="https://github.com/nntrainer/Quick.AI/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"/></a>
   <br/>
   <img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square" alt="License"/>
   <img src="https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B&logoColor=white&style=flat-square" alt="C++17"/>
@@ -138,7 +138,7 @@ Native **C and C++ APIs** plus a clean Android JNI build. Same source tree build
 
 ```bash
 # 1 · Clone (with submodules — NNTrainer rides along)
-git clone --recursive https://github.com/EunjuYang/Quick.AI.git
+git clone --recursive https://github.com/nntrainer/Quick.AI.git
 cd Quick.AI
 
 # 2 · System deps (Ubuntu 22.04 / 24.04)
