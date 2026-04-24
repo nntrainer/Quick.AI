@@ -23,6 +23,12 @@ jobs:
           submodules: recursive
           fetch-depth: 1
 
+      - name: Override submodules from PR title
+        if: github.event_name == 'pull_request'
+        uses: ./.github/actions/override-submodules-from-pr
+        with:
+          pr-title: ${{ github.event.pull_request.title }}
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
