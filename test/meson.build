@@ -19,7 +19,12 @@ test_common_deps = [
   openmp_dep,
 ]
 
-test_common_inc = quick_dot_ai_inc
+# quick_dot_ai_inc only adds the project root and models/. The C-API headers
+# live under api/ and are pulled in by tests via "#include \"causal_lm_api.h\"",
+# so the directory has to be on the include path explicitly.
+test_common_inc = quick_dot_ai_inc + [
+  include_directories('..' / 'api'),
+]
 
 # ---------------------------------------------------------------------------
 # Tests that do NOT need any model weights. These run on every CI job.

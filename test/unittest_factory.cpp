@@ -15,9 +15,9 @@
 
 #include <gtest/gtest.h>
 
-#include <nlohmann/json.hpp>
 #include <sstream>
 
+#include "json.hpp"
 #include <factory.h>
 
 using json = nlohmann::json;
