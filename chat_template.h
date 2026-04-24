@@ -5,7 +5,7 @@
  * @file    chat_template.h
  * @date    10 Apr 2026
  * @brief   Chat template support using tokenizer_config.json
- * @see     https://github.com/nntrainer/nntrainer
+ * @see     https://github.com/nntrainer/Quick.AI
  * @author  Eunju Yang <ej.yang@samsung.com>
  * @bug     No known bugs except for NYI items
  */
