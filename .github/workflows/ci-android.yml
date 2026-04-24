@@ -17,10 +17,17 @@ jobs:
           fetch-depth: 1
 
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r26d
           link-to-sdk: true
+
+      - name: Export Android NDK env
+        run: |
+          echo "ANDROID_NDK=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
 
       - name: Install system dependencies
         run: |
@@ -29,6 +36,7 @@ jobs:
             tar wget gzip \
             pkg-config \
             build-essential \
+            cmake \
             flex bison \
             python3-dev python3-numpy python3 \
             meson ninja-build \
