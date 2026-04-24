@@ -1,1 +1,3 @@
 option('platform', type: 'combo', choices: ['none', 'tizen', 'yocto', 'android', 'windows'], value: 'none')
+option('enable-test', type: 'boolean', value: false,
+  description: 'Build Quick.AI GoogleTest unit tests under test/.')
