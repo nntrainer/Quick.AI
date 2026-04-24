@@ -60,6 +60,16 @@ actual weights file name (`nntr_qwen3_0.6b_w4e4a32.bin`) declared inside
 Stages the model (unless `QUICKAI_SKIP_MODEL_DOWNLOAD=1`), reconfigures
 meson with `-Denable-test=true`, runs `ninja` and finally `meson test`.
 
+## Known limitation: Qwen3-0.6B Q4_0 + tied embedding
+
+The public Qwen3-0.6B bundle ships with `tie_word_embeddings=true` and a Q4_0
+LM head, but `layers/tie_word_embedding.cpp` currently accepts only Q6_K or
+FP32 weights for the tied path and throws `Tieword embedding is not supported
+yet for the data type` at the first decode step. `unittest_causal_lm_api`
+recognises this specific failure (`runModel` returns `INFERENCE_FAILED`),
+emits `GTEST_SKIP` and the suite remains green. Once NNTrainer adds Q4_0
+support for the tied path the test will switch back to PASS automatically.
+
 ## Environment overrides
 
 - `QUICKAI_TEST_MODEL_DIR` - point `unittest_causal_lm_api` at an
