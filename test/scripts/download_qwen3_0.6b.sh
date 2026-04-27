@@ -20,8 +20,9 @@
 #   test/scripts/download_qwen3_0.6b.sh [install_root]
 #
 # Environment:
-#   QUICKAI_MODELS_REPO_BRANCH   models repo branch (default: claude/add-quickai-unit-tests-iSy5U)
-#                                flip to `main` once the branch is merged
+#   QUICKAI_MODELS_REPO_BRANCH   models repo branch (default: main)
+#                                point at a feature branch when iterating on
+#                                a not-yet-merged bundle revision
 #   QUICK_DOT_AI_QUANTIZE        quantizer binary for local rebuild
 #                                (defaults to <install_root>/build/quick_dot_ai_quantize)
 
@@ -32,7 +33,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 INSTALL_ROOT="${1:-$REPO_ROOT}"
 
 MODEL_REPO_URL="https://github.com/eunjuyang/nntrainer-causallm-models.git"
-MODEL_REPO_BRANCH="${QUICKAI_MODELS_REPO_BRANCH:-claude/add-quickai-unit-tests-iSy5U}"
+MODEL_REPO_BRANCH="${QUICKAI_MODELS_REPO_BRANCH:-main}"
 MODEL_DIR_NAME="qwen3-0.6b-q40-q6k-x86"
 TARGET_DIR_NAME="qwen3-0.6b-w16a16"
 BIN_FILE_NAME="nntr_qwen3_0.6b_w4e6a32.bin"
