@@ -30,6 +30,8 @@
 #include <model.h>
 
 #include <fstream>
+#include <map>
+#include <stdexcept>
 #include <tokenizers_c.h>
 #include <tokenizers_cpp.h>
 
@@ -81,6 +83,24 @@ public:
    * @brief Save the weight to a file
    */
   virtual void save_weight(const std::string &weight_path) = 0;
+
+  /**
+   * @brief Save the weight to a file with type conversion
+   * @param weight_path Path to save the weight file
+   * @param dtype Global target data type for all layers (NONE = keep original)
+   * @param layer_dtype_map Per-layer data type overrides (layer_name -> dtype)
+   * @note Default implementation throws; concrete subclasses that support
+   *       type-converted save (e.g. NNTrainer-based Transformer) override it.
+   */
+  virtual void
+  save_weight(const std::string &weight_path,
+              ml::train::TensorDim::DataType dtype,
+              const std::map<std::string, ml::train::TensorDim::DataType>
+                &layer_dtype_map = {}) {
+    throw std::runtime_error(
+      "save_weight with type conversion is not implemented for this "
+      "TransformerBase subclass");
+  }
 
   /**
    * @brief run the Transformer model (simple)

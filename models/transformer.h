@@ -75,11 +75,10 @@ public:
    * @param dtype Global target data type for all layers (NONE = keep original)
    * @param layer_dtype_map Per-layer data type overrides (layer_name -> dtype)
    */
-  virtual void
-  save_weight(const std::string &weight_path,
-              ml::train::TensorDim::DataType dtype,
-              const std::map<std::string, ml::train::TensorDim::DataType>
-                &layer_dtype_map = {});
+  void save_weight(const std::string &weight_path,
+                   ml::train::TensorDim::DataType dtype,
+                   const std::map<std::string, ml::train::TensorDim::DataType>
+                     &layer_dtype_map = {}) override;
 
   /**
    * @copydoc TransformerBase::run(const WSTR, void *, bool)
