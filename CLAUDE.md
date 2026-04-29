@@ -4,6 +4,11 @@ This file briefs Claude Code (and any new contributor) on Quick.AI's
 conventions before making changes. Read it top-to-bottom — it is
 deliberately short.
 
+The bulk of this document is contributor-facing guidance that applies
+to humans and AI coding agents alike. Agent-specific rules (Claude
+Code, other coding agents) live in [a single dedicated section at the
+bottom](#for-ai-coding-agents).
+
 ---
 
 ## Project at a glance
@@ -193,9 +198,8 @@ Rename project to Quick.AI; unify identifiers to quick_dot_ai
 
 ## Branching & PR workflow
 
-- This Claude session works **only** on
-  `claude/create-claude-md-76OxU`. All commits and pushes go there.
-- Branch naming patterns observed in the repo:
+- Work on a topic branch; never commit directly to `main`. Branch
+  naming patterns observed in the repo:
   `feat/...`, `bugfix/...`, `ci/...`, `unittest/...`, `claude/...`.
 - A PR is gated by:
   | Workflow | What it does |
@@ -207,7 +211,6 @@ Rename project to Quick.AI; unify identifiers to quick_dot_ai
 - `check_count.yml` + `labeler.yml` toggle `Need Review` and
   `PR/READY2MERGE` based on **2 approving reviewers** (Quick.AI's
   threshold; nntrainer uses 3).
-- **Do not open a PR unless the user explicitly asks for one.**
 
 ---
 
@@ -292,3 +295,30 @@ Verify: `meson setup build && ninja -C build && \
   from.
 - Do not push to `main` directly, and do not force-push to any
   shared branch.
+
+---
+
+## For AI coding agents
+
+This section collects rules that apply specifically to AI coding
+agents (Claude Code, and any other tool that drives commits/PRs on
+behalf of a human). It supplements — does not replace — every other
+rule above. If you are a human reading this file, you can skip it.
+
+- **Stay on the topic branch the user named for the session.** Do
+  not open new branches, rebase shared branches, or rewrite history
+  on branches the user did not authorize.
+- **Do not open a pull request unless the user explicitly asks for
+  one.** Pushing the branch is fine; opening / merging the PR is the
+  user's call.
+- **Never force-push to `main` or any shared branch**, and avoid
+  force-push on user-visible feature branches unless the user asks.
+- **Keep the DCO trailer honest.** Sign off as the human running the
+  session (or as instructed). Do not invent `Co-Authored-By:`
+  trailers.
+- **Treat `api/causal_lm_api.h` and `factory.h` as load-bearing.**
+  Surface any change to those files explicitly in the PR / commit
+  message so a human reviewer can sanity-check the ABI impact.
+- **Run the local format / build smoke tests** described above
+  before pushing, even when CI will rerun them — failing CI on
+  trivial whitespace wastes a review round trip.
