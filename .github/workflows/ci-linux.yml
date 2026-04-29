@@ -34,7 +34,9 @@ jobs:
             libiniparser-dev \
             libomp-dev \
             libflatbuffers-dev \
-            flatbuffers-compiler
+            flatbuffers-compiler \
+            libgtest-dev \
+            libgmock-dev
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -45,7 +47,7 @@ jobs:
         run: pip install meson ninja
 
       - name: Meson setup
-        run: meson setup build
+        run: meson setup build -Denable-test=true
 
       - name: Build
         run: ninja -C build
@@ -58,3 +60,14 @@ jobs:
           test -x build/quick_dot_ai_test_api
           ./build/quick_dot_ai_run 2>&1 | head -1 || true
           ./build/quick_dot_ai_quantize 2>&1 | head -1 || true
+
+      - name: Run unit tests
+        run: meson test -C build --print-errorlogs
+
+      - name: Upload meson test log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meson-testlog-${{ matrix.os }}
+          path: build/meson-logs/testlog.txt
+          if-no-files-found: ignore
