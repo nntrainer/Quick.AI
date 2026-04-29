@@ -148,7 +148,7 @@ sudo apt-get install -y libopenblas-dev libflatbuffers-dev flatbuffers-compiler 
 pip install meson ninja
 
 # 3 · Build (~1 min on a modern laptop)
-meson setup build -Denable-fp16=true -Dthread-backend=omp -Domp-num-threads=4
+meson setup build -Dnntrainer:enable-fp16=true -Dnntrainer:thread-backend=omp -Dnntrainer:omp-num-threads=4
 ninja -C build
 
 # 4 · Generate
