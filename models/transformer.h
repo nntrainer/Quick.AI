@@ -122,6 +122,13 @@ public:
     return performance_metrics;
   }
 
+  /**
+   * @brief get the status of run
+   */
+  bool hasRun() const { return has_run_; }
+
+  bool has_run_ = false;
+
 protected:
   /**
    * @brief Setup the parameters for the Transformer model
