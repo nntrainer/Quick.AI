@@ -39,7 +39,7 @@
 
 using json = nlohmann::json;
 
-static std::unique_ptr<quick_dot_ai::Transformer> g_model;
+static std::unique_ptr<quick_dot_ai::TransformerBase> g_model;
 static std::mutex g_mutex;
 static bool g_initialized = false;
 static std::string g_architecture = "";
@@ -565,10 +565,10 @@ ErrorCode runModel(const char *inputTextPrompt, const char **outputText) {
 
 // We assume single batch request for this API
 #if defined(_WIN32)
-    g_model->run(std::wstring(input.begin(), input.end()), false, L"", L"",
+    g_model->run(std::wstring(input.begin(), input.end()), L"", L"", nullptr,
                  g_verbose);
 #else
-    g_model->run(input, false, "", "", g_verbose);
+    g_model->run(input, "", "", nullptr, g_verbose);
 #endif
 
     auto causal_lm_model = dynamic_cast<quick_dot_ai::CausalLM *>(g_model.get());
