@@ -31,7 +31,7 @@ namespace quick_dot_ai {
  * @class   SlimMoELayer
  * @brief   Mixture of Expert Layer
  */
-class SlimMoELayer : public nntrainer::LayerImpl {
+class WIN_EXPORT SlimMoELayer : public nntrainer::LayerImpl {
 public:
   /**
    * @brief     Constructor of Mixture of Expert Layer

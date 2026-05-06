@@ -16,8 +16,10 @@
 #include <engine.h>
 #include <sentence_transformer.h>
 
+#include <codecvt>
 #include <filesystem>
 #include <iostream>
+#include <locale>
 
 namespace quick_dot_ai {
 

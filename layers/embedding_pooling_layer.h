@@ -17,6 +17,12 @@
 #include <common_properties.h>
 #include <layer_impl.h>
 
+#ifdef _WIN32
+#define WIN_EXPORT __declspec(dllexport)
+#else
+#define WIN_EXPORT
+#endif
+
 namespace quick_dot_ai {
 
 namespace props {
@@ -114,7 +120,7 @@ public:
  * implemented. Other pooling modes are defined as properties but their logic is
  * not yet implemented.
  */
-class EmbeddingPoolingLayer : public nntrainer::LayerImpl {
+class WIN_EXPORT EmbeddingPoolingLayer : public nntrainer::LayerImpl {
 public:
   /**
    * @brief Construct a new Embedding Pooling Layer object

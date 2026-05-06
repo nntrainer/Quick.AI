@@ -24,6 +24,7 @@
 #include <acti_func.h>
 #include <algorithm>
 #include <cmath>
+#include <deque>
 #include <gpt_oss_moe_layer_cached.h>
 #include <node_exporter.h>
 #include <omp.h>
@@ -316,7 +317,10 @@ void CachedSlimGptOssMoELayer::incremental_forwarding(
 #endif
 
 #pragma omp parallel for schedule(dynamic)
-    for (int expert_idx : target_idx_vector) {
+    for (int target_pos = 0;
+         target_pos < static_cast<int>(target_idx_vector.size());
+         ++target_pos) {
+      int expert_idx = target_idx_vector[target_pos];
       const auto &assignments = expert_assignments[expert_idx];
       if (need_load[expert_idx]) {
 
@@ -486,13 +490,14 @@ inline void CachedSlimGptOssMoELayer::compute_expert_forward(
   if (num_tokens > 1) {
     /** if prefill, copy data to make a batch */
 #pragma omp parallel for schedule(static) if (num_tokens > 4)
-    for (size_t i = 0; i < num_tokens; ++i) {
-      const unsigned token_idx = token_assignments[i].first;
+    for (int i = 0; i < static_cast<int>(num_tokens); ++i) {
+      const size_t token_pos = static_cast<size_t>(i);
+      const unsigned token_idx = token_assignments[token_pos].first;
       // Use tensor's optimized copy operation
       nntrainer::Tensor src_view = input.getSharedDataTensor(
         {1, 1, 1, hidden_size}, token_idx * hidden_size, true);
       nntrainer::Tensor dst_view = token_input.getSharedDataTensor(
-        {1, 1, 1, hidden_size}, i * hidden_size, true);
+        {1, 1, 1, hidden_size}, token_pos * hidden_size, true);
       dst_view.copyData(src_view);
     }
   } else {
@@ -526,8 +531,9 @@ inline void CachedSlimGptOssMoELayer::compute_expert_forward(
   // Z := up_out + 1
   up_out.add_i(1);
 #pragma omp parallel for schedule(static) if (num_tokens > 2)
-  for (size_t i = 0; i < num_tokens; ++i) {
-    const unsigned offset = acti_out.getIndex(0, 0, i, 0);
+  for (int i = 0; i < static_cast<int>(num_tokens); ++i) {
+    const unsigned offset =
+      acti_out.getIndex(0, 0, static_cast<unsigned int>(i), 0);
     nntrainer::swiglu(acti_out.width(), acti_out.getData<float>() + offset,
                       gate_out.getData<float>() + offset,
                       up_out.getData<float>() + offset, alpha);
@@ -539,9 +545,10 @@ inline void CachedSlimGptOssMoELayer::compute_expert_forward(
 
   // accumulate to output
 #pragma omp parallel for schedule(static) if (num_tokens > 2)
-  for (size_t i = 0; i < num_tokens; ++i) {
-    token_idx = token_assignments[i].first;
-    weight = token_assignments[i].second;
+  for (int i = 0; i < static_cast<int>(num_tokens); ++i) {
+    const size_t token_pos = static_cast<size_t>(i);
+    token_idx = token_assignments[token_pos].first;
+    weight = token_assignments[token_pos].second;
     size_t output_offset = token_idx * hidden_size;
     nntrainer::Tensor token_output =
       expert_output.getSharedDataTensor(out_step_dim, output_offset, true);

@@ -18,7 +18,7 @@ Qwen 3, GPT-OSS, Gemma 3, Llama and more, with <strong>MoE on phones</strong> vi
   <img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square" alt="License"/>
   <img src="https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B&logoColor=white&style=flat-square" alt="C++17"/>
   <img src="https://img.shields.io/badge/Android-NDK%20r26d-3DDC84?logo=android&logoColor=white&style=flat-square" alt="Android"/>
-  <img src="https://img.shields.io/badge/platform-Linux%20·%20Android-lightgrey?style=flat-square" alt="Platform"/>
+  <img src="https://img.shields.io/badge/platform-Linux%20·%20Android%20·%20Windows-lightgrey?style=flat-square" alt="Platform"/>
   <img src="https://img.shields.io/badge/offline-100%25-success?style=flat-square" alt="Offline"/>
 </p>
 
@@ -26,6 +26,7 @@ Qwen 3, GPT-OSS, Gemma 3, Llama and more, with <strong>MoE on phones</strong> vi
   <a href="#quick-start">Quick start</a> ·
   <a href="#see-it-in-action">Demos</a> ·
   <a href="#supported-models">Models</a> ·
+  <a href="#windows-build">Windows</a> ·
   <a href="#android-build">Android</a> ·
   <a href="#quantization">Quantization</a> ·
   <a href="#chat-template">Chat Template</a> ·
@@ -159,6 +160,41 @@ export OMP_NUM_THREADS=4 OMP_WAIT_POLICY=active OMP_PROC_BIND=true OMP_PLACES=co
 > **Model layout** — drop a model into `res/<name>/` containing
 > `config.json`, `generation_config.json`, `tokenizer.json`, `tokenizer_config.json`,
 > `vocab.json`, `nntr_config.json`, and the NNTrainer `.bin` weight file referenced from `nntr_config.json`.
+
+---
+
+## Windows build
+
+Windows builds use MSVC through Visual Studio 2022 and the same
+Meson/Ninja flow as Linux. The helper script initializes Quick.AI's
+submodules, so it works after either a recursive clone or a plain clone.
+It links the vendored Windows `tokenizers_c.lib` from `lib/`, matching
+the Linux `libtokenizers_c.a` archive used by the default build.
+
+**Prerequisites:** Visual Studio 2022 Build Tools with the C++ desktop
+workload, Python, Meson, Ninja, CMake, and Git.
+
+```powershell
+git clone https://github.com/nntrainer/Quick.AI.git
+cd Quick.AI
+py -m pip install meson ninja
+
+# Run from a VS 2022 x64 Developer PowerShell / Command Prompt.
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build_windows.ps1
+```
+
+From a regular PowerShell, load the Visual Studio compiler environment
+first. For the default Build Tools install path:
+
+```powershell
+& cmd.exe /d /s /c "`"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat`" && powershell -NoProfile -ExecutionPolicy Bypass -File build_windows.ps1"
+```
+
+Artifacts land under `build-win/`, including `quick_dot_ai.dll`,
+`quick_dot_ai_run.exe`, `quick_dot_ai_quantize.exe`, and the layer
+plugin DLLs. The Windows helper currently passes `-Dcpp_std=c++20` for
+MSVC compatibility while the Linux and Android build path keeps the
+project default.
 
 ---
 
@@ -312,6 +348,8 @@ Every PR is gated by:
 | **CodeQL** | security & quality static analysis |
 
 Workflows live under [`.github/workflows/`](.github/workflows/).
+The Windows build path is currently a local smoke path through
+`build_windows.ps1`; it is not yet a PR gate.
 
 ---
 

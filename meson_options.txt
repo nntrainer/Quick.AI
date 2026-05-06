@@ -1,3 +1,11 @@
 option('platform', type: 'combo', choices: ['none', 'tizen', 'yocto', 'android', 'windows'], value: 'none')
+option('enable-fp16', type: 'boolean', value: false,
+  description: 'Forward FP16 enablement to the bundled NNTrainer subproject.')
+option('enable-openmp', type: 'boolean', value: true,
+  description: 'Enable OpenMP for Quick.AI and the bundled NNTrainer subproject.')
+option('thread-backend', type: 'string', value: 'omp',
+  description: 'Forward NNTrainer thread backend selection.')
+option('omp-num-threads', type: 'integer', min: 0, max: 9999, value: 6,
+  description: 'Forward NNTrainer OpenMP thread count.')
 option('enable-test', type: 'boolean', value: false,
   description: 'Build Quick.AI GoogleTest unit tests under test/.')

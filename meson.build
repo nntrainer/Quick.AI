@@ -17,9 +17,15 @@ project('quick_dot_ai', 'c', 'cpp',
 nntrainer_proj = subproject('nntrainer',
   default_options: [
     'enable-app=false',
+    'install-app=false',
     'enable-test=false',
     'enable-tflite-backbone=false',
     'enable-tflite-interpreter=false',
+    'platform=' + get_option('platform'),
+    'enable-fp16=' + get_option('enable-fp16').to_string(),
+    'enable-openmp=' + get_option('enable-openmp').to_string(),
+    'thread-backend=' + get_option('thread-backend'),
+    'omp-num-threads=' + get_option('omp-num-threads').to_string(),
     'werror=false',
   ],
 )
@@ -28,7 +34,7 @@ nntrainer_dep       = nntrainer_proj.get_variable('nntrainer_dep')
 nntrainer_ccapi_dep = nntrainer_proj.get_variable('nntrainer_ccapi_dep')
 application_install_dir = get_option('prefix') / get_option('libdir') / 'quick_dot_ai'
 
-openmp_dep = dependency('openmp')
+openmp_dep = dependency('openmp', required: get_option('enable-openmp'))
 powershell_prog = find_program('powershell', required: (build_machine.system() == 'windows'))
 
 quick_dot_ai_src = [
@@ -74,7 +80,22 @@ elif get_option('platform') != 'tizen'
 endif
 
 tokenizer_dependencies = []
-tokenizer_path = meson.current_source_dir() / 'lib' / 'libtokenizers_c.a'
+tokenizer_link_args = []
+
+if (get_option('platform') == 'windows') and (build_machine.system() == 'windows')
+    tokenizer_link_args += [
+        meson.current_source_dir() / 'lib' / 'tokenizers_c.lib',
+        'ntdll.lib',
+        'wsock32.lib',
+        'ws2_32.lib',
+        'Bcrypt.lib',
+        'iphlpapi.lib',
+        'userenv.lib',
+        'psapi.lib',
+    ]
+else
+    tokenizer_link_args += [meson.current_source_dir() / 'lib' / 'libtokenizers_c.a']
+endif
 
 cpp_args = []
 
@@ -94,7 +115,7 @@ quick_dot_ai = shared_library('quick_dot_ai',
     include_directories: quick_dot_ai_inc,
     install: true,
     install_dir: application_install_dir,
-    link_args: [tokenizer_path],
+    link_args: tokenizer_link_args,
     cpp_args: cpp_args
 )
 
@@ -103,10 +124,33 @@ quick_dot_ai_dep = declare_dependency(
     include_directories: quick_dot_ai_inc
 )
 
+quick_dot_ai_executable_dependencies = [
+    nntrainer_dep,
+    nntrainer_ccapi_dep,
+    quick_dot_ai_layer_dependencies,
+]
+quick_dot_ai_executable_link_args = []
+quick_dot_ai_executable_cpp_args = []
+quick_dot_ai_executable_common_src = []
+quick_dot_ai_executable_extra_dependencies = [quick_dot_ai_dep]
+
+if (get_option('platform') == 'windows') and (build_machine.system() == 'windows')
+    quick_dot_ai_executable_dependencies += [
+        tokenizer_dependencies,
+        openmp_dep,
+    ]
+    quick_dot_ai_executable_link_args += tokenizer_link_args
+    quick_dot_ai_executable_cpp_args += cpp_args
+    quick_dot_ai_executable_common_src += quick_dot_ai_src
+    quick_dot_ai_executable_extra_dependencies = []
+endif
+
 e = executable('quick_dot_ai_run',
-    executable_src,
+    executable_src + quick_dot_ai_executable_common_src,
     include_directories: quick_dot_ai_inc,
-    dependencies: [nntrainer_dep, nntrainer_ccapi_dep, quick_dot_ai_layer_dependencies, quick_dot_ai_dep],
+    dependencies: quick_dot_ai_executable_dependencies + quick_dot_ai_executable_extra_dependencies,
+    link_args: quick_dot_ai_executable_link_args,
+    cpp_args: quick_dot_ai_executable_cpp_args,
 )
 
 
@@ -115,9 +159,11 @@ quantize_src = [
 ]
 
 e_quantize = executable('quick_dot_ai_quantize',
-    quantize_src,
+    quantize_src + quick_dot_ai_executable_common_src,
     include_directories: quick_dot_ai_inc,
-    dependencies: [nntrainer_dep, nntrainer_ccapi_dep, quick_dot_ai_layer_dependencies, quick_dot_ai_dep],
+    dependencies: quick_dot_ai_executable_dependencies + quick_dot_ai_executable_extra_dependencies,
+    link_args: quick_dot_ai_executable_link_args,
+    cpp_args: quick_dot_ai_executable_cpp_args,
 )
 
 

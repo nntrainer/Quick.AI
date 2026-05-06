@@ -66,6 +66,11 @@ flowchart TB
 
 All three link against `libquick_dot_ai.so` and (where relevant) `libquick_dot_ai_api.so`.
 
+On Windows, `quick_dot_ai_run` and `quick_dot_ai_quantize` also compile
+the core Quick.AI sources into the executable targets. This keeps the
+stable C API exported from `quick_dot_ai.dll` without requiring the full
+C++ model class surface to be exported for MSVC.
+
 ### 2. C API (`libquick_dot_ai_api.so`)
 
 The integration surface for host applications — Android JNI, iOS, server processes, anything that wants to call into Quick.AI without taking a C++ dependency.
@@ -128,6 +133,14 @@ so only the core engine and the C++ API ride along — not the rest of NNTrainer
 | Flatbuffers | NNTrainer's serialized model format |
 
 On Android the same role is filled by NDK-bundled libomp + an in-tree BLAS path; see [`jni/Android.mk`](../jni/Android.mk).
+
+On Windows, [`build_windows.ps1`](../build_windows.ps1) initializes the
+submodules and then runs the same Meson/Ninja build flow with
+`platform=windows`. The build links the vendored `lib/tokenizers_c.lib`,
+which is the MSVC counterpart to the Linux `lib/libtokenizers_c.a`.
+[`tools/pyutils/generate_def.py`](../tools/pyutils/generate_def.py)
+keeps NNTrainer's Windows DEF generation working while NNTrainer remains
+a pinned nested submodule.
 
 ---
 

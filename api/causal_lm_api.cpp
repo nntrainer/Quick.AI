@@ -35,7 +35,9 @@
 #include <factory.h>
 #include <fstream>
 #include <sys/stat.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 using json = nlohmann::json;
 

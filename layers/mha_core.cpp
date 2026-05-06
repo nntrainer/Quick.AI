@@ -378,11 +378,13 @@ void MHACoreLayer::compute_kcaches(
       float *out_data = out.getData<float>();
 
 #pragma omp parallel for schedule(static)
-      for (unsigned int head_kv = 0; head_kv < num_cache_head; ++head_kv) {
+      for (int head_kv = 0; head_kv < static_cast<int>(num_cache_head);
+           ++head_kv) {
         nntrainer::compute_kcaches<uint16_t>(
           in_data, cache_data, out_data, row_to_compute, num_cache_head,
-          head_dim, group_size, tile_size, local_window_size, head_kv,
-          head_kv + 1);
+          head_dim, group_size, tile_size, local_window_size,
+          static_cast<unsigned int>(head_kv),
+          static_cast<unsigned int>(head_kv + 1));
       }
 
     } else {
@@ -426,10 +428,13 @@ void MHACoreLayer::compute_kcaches(
       _FP16 *out_data = out.getData<_FP16>();
 
 #pragma omp parallel for schedule(static)
-      for (unsigned int head_kv = 0; head_kv < num_cache_head; ++head_kv) {
+      for (int head_kv = 0; head_kv < static_cast<int>(num_cache_head);
+           ++head_kv) {
         nntrainer::compute_kcaches(
           in_data, cache_data, out_data, num_rows, num_cache_head, head_dim,
-          group_size, tile_size, local_window_size, head_kv, head_kv + 1);
+          group_size, tile_size, local_window_size,
+          static_cast<unsigned int>(head_kv),
+          static_cast<unsigned int>(head_kv + 1));
       }
     } else {
       std::vector<std::future<void>> futures;

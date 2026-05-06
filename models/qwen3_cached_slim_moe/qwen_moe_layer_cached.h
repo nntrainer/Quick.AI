@@ -32,7 +32,7 @@ namespace quick_dot_ai {
  * @class   SlimMoELayer
  * @brief   Mixture of Expert Layer
  */
-class CachedSlimMoELayer : public nntrainer::LayerImpl {
+class WIN_EXPORT CachedSlimMoELayer : public nntrainer::LayerImpl {
 public:
   /**
    * @brief     Constructor of Mixture of Expert Layer
@@ -107,7 +107,7 @@ public:
    */
   bool supportBackwarding() const override { return false; }
 
-  WIN_EXPORT void updateTensorsByInputDimensions(
+  void updateTensorsByInputDimensions(
     nntrainer::RunLayerContext &context,
     std::vector<nntrainer::TensorDim> input_dimensions) override;
 

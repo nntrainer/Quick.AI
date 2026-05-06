@@ -26,7 +26,7 @@ namespace quick_dot_ai {
  * @class   GptOssMoELayer
  * @brief   Mixture of Expert Layer
  */
-class GptOssMoELayer : public nntrainer::LayerImpl {
+class WIN_EXPORT GptOssMoELayer : public nntrainer::LayerImpl {
 public:
   /**
    * @brief     Constructor of Mixture of Expert Layer

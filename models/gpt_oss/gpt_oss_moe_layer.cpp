@@ -426,14 +426,24 @@ inline void GptOssMoELayer::compute_expert_forward_no_critical(
     // Z := up_out + 1
     up_out.add_i(1);
 #pragma omp parallel for collapse(3)
-    for (unsigned int b = 0; b < acti_out.batch(); ++b) {
-      for (unsigned int c = 0; c < acti_out.channel(); ++c) {
-        for (unsigned int h = 0; h < acti_out.height(); ++h) {
+    for (int b = 0; b < static_cast<int>(acti_out.batch()); ++b) {
+      for (int c = 0; c < static_cast<int>(acti_out.channel()); ++c) {
+        for (int h = 0; h < static_cast<int>(acti_out.height()); ++h) {
           nntrainer::swiglu(
             acti_out.width(),
-            acti_out.getData<float>() + acti_out.getIndex(b, c, h, 0),
-            gate_out.getData<float>() + gate_out.getIndex(b, c, h, 0),
-            up_out.getData<float>() + up_out.getIndex(b, c, h, 0), alpha);
+            acti_out.getData<float>() +
+              acti_out.getIndex(static_cast<unsigned int>(b),
+                                static_cast<unsigned int>(c),
+                                static_cast<unsigned int>(h), 0),
+            gate_out.getData<float>() +
+              gate_out.getIndex(static_cast<unsigned int>(b),
+                                static_cast<unsigned int>(c),
+                                static_cast<unsigned int>(h), 0),
+            up_out.getData<float>() +
+              up_out.getIndex(static_cast<unsigned int>(b),
+                              static_cast<unsigned int>(c),
+                              static_cast<unsigned int>(h), 0),
+            alpha);
         }
       }
     }

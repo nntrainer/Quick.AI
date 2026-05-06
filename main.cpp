@@ -43,10 +43,16 @@
 #include "qwen3_moe_causallm.h"
 #include "qwen3_slim_moe_causallm.h"
 #include <models/gemma3/function.h>
+#ifndef _WIN32
 #include <sys/resource.h>
+#endif
 
 #include <atomic>
 #include <chrono>
+#if defined(_WIN32)
+#include <codecvt>
+#include <locale>
+#endif
 #include <filesystem>
 #include <thread>
 
@@ -55,14 +61,28 @@ using json = nlohmann::json;
 std::atomic<size_t> peak_rss_kb{0};
 std::atomic<bool> tracking_enabled{true};
 
+#if defined(_WIN32)
+static std::wstring utf8_to_wstring(const std::string &text) {
+  std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+  return converter.from_bytes(text);
+}
+#endif
+
 void printMemoryUsage() {
+#if defined(_WIN32)
+  std::cout << "Max Resident Set Size: unavailable on Windows" << std::endl;
+#else
   struct rusage usage;
   getrusage(RUSAGE_SELF, &usage);
   std::cout << "Max Resident Set Size: " << usage.ru_maxrss << " KB"
             << std::endl;
+#endif
 }
 
 size_t read_vm_rss_kb() {
+#if defined(_WIN32)
+  return 0;
+#else
   std::ifstream status("/proc/self/status");
   std::string line;
   while (std::getline(status, line)) {
@@ -73,9 +93,13 @@ size_t read_vm_rss_kb() {
     }
   }
   return 0;
+#endif
 }
 
 size_t read_private_rss_kb() {
+#if defined(_WIN32)
+  return 0;
+#else
   std::ifstream smaps("/proc/self/smaps_rollup");
   std::string line;
   size_t total = 0;
@@ -87,6 +111,7 @@ size_t read_private_rss_kb() {
     }
   }
   return total;
+#endif
 }
 
 void start_peak_tracker() {
@@ -309,8 +334,9 @@ int main(int argc, char *argv[]) {
     start_peak_tracker();
 #endif
 #if defined(_WIN32)
-    model->run(input_text.c_str(), do_sample, system_head_prompt.c_str(),
-               system_tail_prompt.c_str());
+    model->run(utf8_to_wstring(input_text), do_sample,
+               utf8_to_wstring(system_head_prompt),
+               utf8_to_wstring(system_tail_prompt));
 #else
     model->run(input_text, do_sample, system_head_prompt, system_tail_prompt);
 #endif
