@@ -85,6 +85,15 @@ public:
    */
   bool hasRun() const { return has_run_; }
 
+  /**
+   * @brief Reset per-request generation state before a stateless serving run.
+   */
+  void resetGenerationState() {
+    pending_ids_.clear();
+    global_token_len = 0;
+    has_run_ = false;
+  }
+
 protected:
   /**
    * @brief Setup the parameters for the CausalLM model

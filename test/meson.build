@@ -54,6 +54,14 @@ unittest_model_config_exe = executable('unittest_model_config',
 )
 test('model_config', unittest_model_config_exe, timeout : 60)
 
+unittest_openai_protocol_exe = executable('unittest_openai_protocol',
+  files('unittest_openai_protocol.cpp', '..' / 'server' / 'openai_protocol.cpp'),
+  include_directories : test_common_inc,
+  dependencies : [gtest_dep],
+  install : false,
+)
+test('openai_protocol', unittest_openai_protocol_exe, timeout : 60)
+
 # ---------------------------------------------------------------------------
 # Tests that depend on assets produced by test/scripts/download_qwen3_0.6b.sh.
 # They GTEST_SKIP at runtime if the files are absent, so registering them

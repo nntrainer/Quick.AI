@@ -16,6 +16,7 @@ meson test -C build --print-errorlogs
 | `unittest_llm_util.cpp` | Logits post-processing helpers declared in `llm_util.hpp` (`generate_multi_tokens`, `applyRepetitionPenalty`, `applyBadWordsPenalty`, `applyTKP`). | No |
 | `unittest_factory.cpp` | `quick_dot_ai::Factory` register / create / override / print. Uses a `UT/` key prefix so it does not collide with production model registrations. | No |
 | `unittest_model_config.cpp` | `registerModelArchitecture`, `registerModel`, `register_builtin_model_configs` (Qwen3-0.6B built-in), `setOptions` flag combinations, null-parameter validation. | No |
+| `unittest_openai_protocol.cpp` | OpenAI-compatible request helper behavior: completion prompt parsing, chat message parsing, content parts, sampling flags, and usage accounting. | No |
 | `unittest_tokenizer.cpp` | HuggingFace tokenizer wrapper from `tokenizers_cpp.h`: `FromBlobJSON`, `Encode`/`Decode` roundtrip, `IdToToken`/`TokenToId`, `EncodeBatch`. | Only `tokenizer.json` |
 | `unittest_causal_lm_api.cpp` | Causal-LM C API lifecycle (error codes for out-of-order calls, null parameters) plus an end-to-end smoke test that loads the model, runs a prompt and fetches `PerformanceMetrics`. | Yes, Qwen3-0.6B Q4_0 |
 

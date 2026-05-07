@@ -35,6 +35,7 @@ nntrainer_ccapi_dep = nntrainer_proj.get_variable('nntrainer_ccapi_dep')
 application_install_dir = get_option('prefix') / get_option('libdir') / 'quick_dot_ai'
 
 openmp_dep = dependency('openmp', required: get_option('enable-openmp'))
+threads_dep = dependency('threads')
 powershell_prog = find_program('powershell', required: (build_machine.system() == 'windows'))
 
 quick_dot_ai_src = [
@@ -149,6 +150,19 @@ e = executable('quick_dot_ai_run',
     executable_src + quick_dot_ai_executable_common_src,
     include_directories: quick_dot_ai_inc,
     dependencies: quick_dot_ai_executable_dependencies + quick_dot_ai_executable_extra_dependencies,
+    link_args: quick_dot_ai_executable_link_args,
+    cpp_args: quick_dot_ai_executable_cpp_args,
+)
+
+server_src = [
+    meson.current_source_dir() / 'server' / 'openai_server.cpp',
+    meson.current_source_dir() / 'server' / 'openai_protocol.cpp',
+]
+
+e_server = executable('quick_dot_ai_server',
+    server_src + quick_dot_ai_executable_common_src,
+    include_directories: quick_dot_ai_inc,
+    dependencies: quick_dot_ai_executable_dependencies + quick_dot_ai_executable_extra_dependencies + [threads_dep],
     link_args: quick_dot_ai_executable_link_args,
     cpp_args: quick_dot_ai_executable_cpp_args,
 )
